@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import './Login.css' // We'll add our CSS animations here
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -47,21 +48,23 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-gray-900 via-gray-800 to-black">
+      {/* Animated floating lights */}
+      <div className="floating-lights"></div>
+
       <div className="max-w-md w-full bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl p-10 text-gray-200 animate-fadeIn">
-        <h2 className="text-3xl font-bold mb-2 text-center">LooQue CRM</h2>
-        <p className="text-center text-gray-400 mb-6 text-sm">
-          Welcome to a Looque ! <br/> "Every morning is a chance to improve, grow, and achieve."
+        <h2 className="text-3xl font-bold mb-2 text-center animate-fadeDown">LooQue CRM</h2>
+        <p className="text-center text-gray-400 mb-6 text-sm animate-fadeDown delay-200">
+          Welcome to Looque! <br/> "Every morning is a chance to improve, grow, and achieve."
         </p>
 
         <div className="flex items-center my-5">
-          <hr className="flex-grow border-gray-700" />
-          
-          <hr className="flex-grow border-gray-700" />
+          <hr className="flex-grow border-gray-700 animate-lineExpand" />
+          <hr className="flex-grow border-gray-700 animate-lineExpand delay-200" />
         </div>
 
-        <p className="text-center text-gray-400 mb-6 text-sm">
-          Enter your appropriate email , password .
+        <p className="text-center text-gray-400 mb-6 text-sm animate-fadeDown delay-400">
+          Enter your appropriate email & password given by company
         </p>
 
         {error && (
@@ -69,9 +72,8 @@ export default function Login() {
             {error}
           </div>
         )}
-        
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 animate-fadeUp delay-600">
           <div className="relative ">
             <input
               type="email"
@@ -94,12 +96,10 @@ export default function Login() {
             />
           </div>
 
-        
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold shadow-lg hover:scale-105 transition transform disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white font-semibold shadow-lg hover:scale-105 transition transform disabled:opacity-50 disabled:cursor-not-allowed animate-pulseButton"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
