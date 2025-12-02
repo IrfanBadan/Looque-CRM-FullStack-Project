@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../services/supabase'
-import { DollarSign, CheckCircle, XCircle, Calendar } from 'lucide-react'
+import { DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 
 export default function SalaryManagement() {
@@ -59,7 +59,6 @@ export default function SalaryManagement() {
       const endDate = new Date(year, month, 0)
 
       for (const employee of employees) {
-        // Count present days
         const { data: attendance, error: attError } = await supabase
           .from('attendance')
           .select('*')
@@ -71,10 +70,8 @@ export default function SalaryManagement() {
 
         const presentDays = attendance?.filter((a) => a.status === 'present').length || 0
         const absentDays = attendance?.filter((a) => a.status === 'absent').length || 0
-        const totalDays = new Date(year, month, 0).getDate()
         const calculatedAmount = (employee.salary_per_day || 0) * presentDays
 
-        // Check if record exists
         const { data: existing } = await supabase
           .from('salary_records')
           .select('id')
@@ -84,7 +81,6 @@ export default function SalaryManagement() {
           .single()
 
         if (existing) {
-          // Update existing record
           await supabase
             .from('salary_records')
             .update({
@@ -94,14 +90,12 @@ export default function SalaryManagement() {
             })
             .eq('id', existing.id)
         } else {
-          // Create new record
           await supabase.from('salary_records').insert({
             user_id: employee.id,
             month,
             year,
             present_days: presentDays,
             absent_days: absentDays,
-            salary_amount: employee.salary || 0,
             calculated_amount: calculatedAmount,
             status: 'pending',
           })
@@ -139,19 +133,22 @@ export default function SalaryManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Salary Management</h1>
-        <div className="flex gap-3">
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
           />
+
           <button
             onClick={calculateSalary}
             disabled={calculating}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 justify-center disabled:opacity-50 w-full sm:w-auto"
           >
             <DollarSign size={20} />
             {calculating ? 'Calculating...' : 'Calculate Salary'}
@@ -159,51 +156,60 @@ export default function SalaryManagement() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      {/* TABLE */}
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : salaryRecords.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
-            No salary records for {format(new Date(selectedMonth + '-01'), 'MMMM yyyy')}. Click
-            "Calculate Salary" to generate records.
+            No salary records for {format(new Date(selectedMonth + '-01'), 'MMMM yyyy')}.
+            Click "Calculate Salary" to generate.
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Employee</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Present Days</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Absent Days</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Salary/Day
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">
-                    Calculated Amount
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Status</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
+                <tr className="border-b border-gray-200 text-xs sm:text-sm">
+                  <th className="text-left py-3 px-2 sm:px-4 font-semibold">Employee</th>
+                  <th className="text-left py-3 px-2 sm:px-4 font-semibold">Role</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Present</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Absent</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Salary/Day</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Amount</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Status</th>
+                  <th className="text-center py-3 px-2 sm:px-4 font-semibold">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {salaryRecords.map((record) => (
-                  <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4">{record.users?.full_name || 'Unknown'}</td>
-                    <td className="py-3 px-4">{record.users?.role || '-'}</td>
-                    <td className="py-3 px-4 text-center">{record.present_days}</td>
-                    <td className="py-3 px-4 text-center">{record.absent_days}</td>
-                    <td className="py-3 px-4 text-center">
-                      ${parseFloat(record.users?.salary_per_day || 0).toFixed(2)}
+                  <tr
+                    key={record.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 text-xs sm:text-sm"
+                  >
+                    <td className="py-3 px-2 sm:px-4">
+                      {record.users?.full_name || 'Unknown'}
                     </td>
-                    <td className="py-3 px-4 text-center font-semibold">
-                      ${parseFloat(record.calculated_amount || 0).toFixed(2)}
+                    <td className="py-3 px-2 sm:px-4">
+                      {record.users?.role || '-'}
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 sm:px-4 text-center">
+                      {record.present_days}
+                    </td>
+                    <td className="py-3 px-2 sm:px-4 text-center">
+                      {record.absent_days}
+                    </td>
+                    <td className="py-3 px-2 sm:px-4 text-center">
+                      ₹{record.users?.salary_per_day || 0}
+                    </td>
+                    <td className="py-3 px-2 sm:px-4 text-center font-semibold">
+                      ₹{record.calculated_amount || 0}
+                    </td>
+                    <td className="py-3 px-2 sm:px-4 text-center">
                       <span
-                        className={`px-2 py-1 rounded text-sm ${
+                        className={`px-2 py-1 rounded text-xs ${
                           record.status === 'paid'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
@@ -212,18 +218,17 @@ export default function SalaryManagement() {
                         {record.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      {record.status === 'pending' && (
+                    <td className="py-3 px-2 sm:px-4 text-center">
+                      {record.status === 'pending' ? (
                         <button
                           onClick={() => markAsPaid(record.id)}
-                          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                          className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                         >
                           Mark Paid
                         </button>
-                      )}
-                      {record.status === 'paid' && record.paid_at && (
-                        <span className="text-xs text-gray-500">
-                          Paid: {format(new Date(record.paid_at), 'MMM d, yyyy')}
+                      ) : (
+                        <span className="text-[10px] text-gray-500 block">
+                          {format(new Date(record.paid_at), 'MMM d, yyyy')}
                         </span>
                       )}
                     </td>
@@ -237,5 +242,3 @@ export default function SalaryManagement() {
     </div>
   )
 }
-
-

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../services/supabase'
-import { Plus, MessageSquare, AlertCircle } from 'lucide-react'
+import { Plus, MessageSquare } from 'lucide-react'
 import { format } from 'date-fns'
 
 export default function Support() {
@@ -123,47 +123,65 @@ export default function Support() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Support Tickets</h1>
+    <div className="space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Support Tickets</h1>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 w-full sm:w-auto justify-center"
         >
           <Plus size={20} />
           New Ticket
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
         {tickets.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No support tickets yet</p>
         ) : (
           <div className="space-y-4">
             {tickets.map((ticket) => (
-              <div key={ticket.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md">
-                <div className="flex items-start justify-between mb-2">
+              <div
+                key={ticket.id}
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-md flex flex-col gap-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
                       <MessageSquare className="text-blue-500" size={20} />
                       <h3 className="font-semibold text-gray-900">{ticket.subject}</h3>
-                      <span className={`px-2 py-1 rounded text-xs ${getPriorityColor(ticket.priority)}`}>
+
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${getPriorityColor(
+                          ticket.priority
+                        )}`}
+                      >
                         {ticket.priority}
                       </span>
-                      <span className={`px-2 py-1 rounded text-xs ${getStatusColor(ticket.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${getStatusColor(
+                          ticket.status
+                        )}`}
+                      >
                         {ticket.status}
                       </span>
                     </div>
+
                     <p className="text-sm text-gray-600 mb-2">{ticket.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                       <span>Customer: {ticket.customers?.full_name || 'Guest'}</span>
                       <span>Created: {format(new Date(ticket.created_at), 'MMM d, yyyy')}</span>
                     </div>
                   </div>
+
+                  {/* Status Dropdown (better on mobile) */}
                   <select
                     value={ticket.status}
                     onChange={(e) => updateTicketStatus(ticket.id, e.target.value)}
-                    className={`px-2 py-1 rounded text-sm border ${getStatusColor(ticket.status)}`}
+                    className={`px-3 py-2 rounded text-sm border min-w-[130px] ${getStatusColor(
+                      ticket.status
+                    )}`}
                   >
                     <option value="open">Open</option>
                     <option value="in_progress">In Progress</option>
@@ -177,16 +195,20 @@ export default function Support() {
         )}
       </div>
 
+      {/* MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Create Support Ticket</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Create Support Ticket</h2>
+
             <form onSubmit={handleAddTicket} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
                 <select
                   value={formData.customer_id}
-                  onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, customer_id: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select customer (optional)</option>
@@ -197,32 +219,41 @@ export default function Support() {
                   ))}
                 </select>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                 <input
                   type="text"
                   required
                   value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subject: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   required
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   rows={4}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                   <select
                     value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, priority: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="low">Low</option>
@@ -231,11 +262,14 @@ export default function Support() {
                     <option value="urgent">Urgent</option>
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="open">Open</option>
@@ -245,7 +279,8 @@ export default function Support() {
                   </select>
                 </div>
               </div>
-              <div className="flex gap-3">
+
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
                   className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"

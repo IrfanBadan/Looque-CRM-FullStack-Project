@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../services/supabase'
-import { Plus, Edit, Megaphone } from 'lucide-react'
+import { Plus, Megaphone } from 'lucide-react'
 import { format } from 'date-fns'
 
 export default function Marketing() {
@@ -28,7 +28,6 @@ export default function Marketing() {
         .from('campaigns')
         .select('*')
         .order('created_at', { ascending: false })
-
       if (error) throw error
       setCampaigns(data || [])
     } catch (error) {
@@ -47,7 +46,6 @@ export default function Marketing() {
         end_date: formData.end_date || null,
         target_segment: formData.target_segment || null,
       })
-
       if (error) throw error
       setShowAddModal(false)
       setFormData({
@@ -89,7 +87,7 @@ export default function Marketing() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 md:px-0">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Marketing Campaigns</h1>
         <button
@@ -101,47 +99,43 @@ export default function Marketing() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
-        {campaigns.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No campaigns yet. Create your first campaign!</p>
-        ) : (
-          <div className="space-y-4">
-            {campaigns.map((campaign) => (
-              <div
-                key={campaign.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Megaphone className="text-blue-500" size={20} />
-                      <h3 className="font-semibold text-gray-900">{campaign.name}</h3>
-                      <span className={`px-2 py-1 rounded text-xs ${getStatusColor(campaign.status)}`}>
-                        {campaign.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{campaign.description || 'No description'}</p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>Type: {campaign.campaign_type}</span>
-                      {campaign.start_date && (
-                        <span>Start: {format(new Date(campaign.start_date), 'MMM d, yyyy')}</span>
-                      )}
-                      {campaign.end_date && (
-                        <span>End: {format(new Date(campaign.end_date), 'MMM d, yyyy')}</span>
-                      )}
-                      {campaign.target_segment && <span>Target: {campaign.target_segment}</span>}
-                    </div>
-                  </div>
+      {campaigns.length === 0 ? (
+        <p className="text-gray-500 text-center py-8">No campaigns yet. Create your first campaign!</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {campaigns.map((campaign) => (
+            <div
+              key={campaign.id}
+              className="border border-gray-200 rounded-lg p-4 hover:shadow-md bg-white"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="text-blue-500" size={20} />
+                  <h3 className="font-semibold text-gray-900">{campaign.name}</h3>
                 </div>
+                <span className={`px-2 py-1 rounded text-xs ${getStatusColor(campaign.status)}`}>
+                  {campaign.status}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <p className="text-sm text-gray-600 mb-2">{campaign.description || 'No description'}</p>
+              <div className="flex flex-col gap-1 text-xs text-gray-500">
+                <span>Type: {campaign.campaign_type}</span>
+                {campaign.start_date && (
+                  <span>Start: {format(new Date(campaign.start_date), 'MMM d, yyyy')}</span>
+                )}
+                {campaign.end_date && (
+                  <span>End: {format(new Date(campaign.end_date), 'MMM d, yyyy')}</span>
+                )}
+                {campaign.target_segment && <span>Target: {campaign.target_segment}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md overflow-auto max-h-[90vh]">
             <h2 className="text-xl font-bold mb-4">Create Campaign</h2>
             <form onSubmit={handleAddCampaign} className="space-y-4">
               <div>
@@ -175,7 +169,7 @@ export default function Marketing() {
                   <option value="promotion">Promotion</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                   <input
@@ -222,7 +216,7 @@ export default function Marketing() {
                   <option value="cancelled">Cancelled</option>
                 </select>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
                   className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"

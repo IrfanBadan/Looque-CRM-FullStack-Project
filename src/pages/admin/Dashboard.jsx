@@ -130,114 +130,137 @@ export default function Dashboard() {
     },
   ]
 
-  return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.title} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="text-white" size={24} />
-                </div>
-              </div>
+ return (
+  <div className="space-y-6">
+
+    {/* Stats Cards */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {statCards.map((stat) => {
+        const Icon = stat.icon
+        return (
+          <div
+            key={stat.title}
+            className="bg-white rounded-xl shadow p-4 sm:p-6 flex items-center justify-between"
+          >
+            <div>
+              <p className="text-gray-600 text-sm sm:text-base">{stat.title}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
+                {stat.value}
+              </p>
             </div>
-          )
-        })}
+            <div className={`${stat.color} p-3 sm:p-4 rounded-lg`}>
+              <Icon className="text-white" size={24} />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+
+    {/* Main Area */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      
+      {/* Today's Attendance */}
+      <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4">
+          Today's Attendance
+        </h3>
+
+        {todayPresent.length === 0 ? (
+          <p className="text-gray-500">No one has marked attendance today</p>
+        ) : (
+          <div className="space-y-3">
+            {todayPresent.map((user) => (
+              <div
+                key={user.id}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-green-50 rounded-lg"
+              >
+                <div className="mb-2 sm:mb-0">
+                  <p className="font-medium text-gray-900">{user.full_name}</p>
+                  <p className="text-sm text-gray-500">{user.role}</p>
+                </div>
+                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  Present
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Today's Attendance */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Attendance</h3>
-          {todayPresent.length === 0 ? (
-            <p className="text-gray-500">No one has marked attendance today</p>
-          ) : (
-            <div className="space-y-2">
-              {todayPresent.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between p-3 bg-green-50 rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{user.full_name}</p>
-                    <p className="text-sm text-gray-500">{user.role}</p>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                    Present
+      {/* Recent Orders */}
+      <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4">Recent Orders</h3>
+
+        {recentOrders.length === 0 ? (
+          <p className="text-gray-500">No orders yet</p>
+        ) : (
+          <div className="space-y-3">
+            {recentOrders.map((order) => (
+              <div
+                key={order.id}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 border border-gray-200 rounded-lg"
+              >
+                <div className="mb-2 sm:mb-0">
+                  <p className="font-medium text-gray-900">{order.order_number}</p>
+                  <p className="text-sm text-gray-500">
+                    {format(new Date(order.created_at), 'MMM d, yyyy h:mm a')}
+                  </p>
+                </div>
+
+                <div className="text-left sm:text-right">
+                  <p className="font-semibold text-gray-900">
+                    ${parseFloat(order.total_amount).toFixed(2)}
+                  </p>
+                  <span
+                    className={`text-xs px-2 py-1 rounded inline-block mt-1 ${
+                      order.status === 'delivered'
+                        ? 'bg-green-100 text-green-800'
+                        : order.status === 'processing'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {order.status}
                   </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Orders</h3>
-          {recentOrders.length === 0 ? (
-            <p className="text-gray-500">No orders yet</p>
-          ) : (
-            <div className="space-y-2">
-              {recentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{order.order_number}</p>
-                    <p className="text-sm text-gray-500">
-                      {format(new Date(order.created_at), 'MMM d, yyyy h:mm a')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">
-                      ${parseFloat(order.total_amount).toFixed(2)}
-                    </p>
-                    <span
-                      className={`text-xs px-2 py-1 rounded ${
-                        order.status === 'delivered'
-                          ? 'bg-green-100 text-green-800'
-                          : order.status === 'processing'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+    </div>
 
-      {/* Revenue Chart */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Trend (Last 7 Days)</h3>
-        {revenueData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
+    {/* Revenue Chart */}
+    <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4">
+        Revenue Trend (Last 7 Days)
+      </h3>
+
+      {revenueData.length > 0 ? (
+        <div className="w-full h-64 sm:h-80">
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart data={revenueData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} name="Revenue ($)" />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#8884d8"
+                strokeWidth={2}
+                name="Revenue ($)"
+              />
             </LineChart>
           </ResponsiveContainer>
-        ) : (
-          <p className="text-gray-500 text-center py-8">No revenue data available</p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center py-8">No revenue data available</p>
+      )}
     </div>
-  )
+  </div>
+)
+
 }
 
