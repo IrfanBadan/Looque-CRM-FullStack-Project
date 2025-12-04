@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import { Plus, Edit, Trash2, Search, UserPlus } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const ROLES = [
   "admin",
@@ -14,6 +15,7 @@ const ROLES = [
 ];
 
 export default function Employees() {
+  const { userProfile } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -221,6 +223,14 @@ export default function Employees() {
                       >
                         <Edit size={18} />
                       </button>
+                      {userProfile?.role === "admin" && employee.role !== "admin" && (
+                        <button
+                          onClick={() => handleDeleteEmployee(employee)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -256,6 +266,14 @@ export default function Employees() {
                 >
                   Edit
                 </button>
+                {userProfile?.role === "admin" && emp.role !== "admin" && (
+                  <button
+                    onClick={() => handleDeleteEmployee(emp)}
+                    className="p-2 text-red-600 bg-white rounded shadow hover:bg-red-50 flex-1"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -348,5 +366,23 @@ export default function Employees() {
         </select>
       </div>
     );
+  }
+
+  async function handleDeleteEmployee(employee) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${employee.full_name}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase.from("users").delete().eq("id", employee.id);
+      if (error) throw error;
+
+      setEmployees((prev) => prev.filter((e) => e.id !== employee.id));
+      alert("Employee deleted successfully");
+    } catch (err) {
+      console.error("Error deleting employee:", err);
+      alert("Failed to delete employee: " + err.message);
+    }
   }
 }

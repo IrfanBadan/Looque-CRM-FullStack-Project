@@ -115,3 +115,4 @@ The employee will receive an email to confirm their account (if email confirmati
 - Employees can mark attendance daily
 
 
+

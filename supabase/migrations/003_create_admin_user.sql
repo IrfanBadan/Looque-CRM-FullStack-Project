@@ -24,3 +24,4 @@ ON CONFLICT (user_id) DO NOTHING;
 -- SELECT id, email FROM auth.users WHERE email = 'your-email@example.com';
 
 
+
